@@ -1,0 +1,83 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Press Start 2P", cursive, sans-serif; /* retro game font */
+}
+
+body {
+  background-color: #5c94fc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#game-container {
+  position: relative;
+  width: 800px;
+  height: 400px;
+  border: 4px solid #000;
+  background-color: #87ceeb;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+#game-canvas {
+  background-color: #87ceeb;
+  display: block;
+}
+
+#score-board,
+#lives-board {
+  position: absolute;
+  top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 2px 2px 0 #000;
+  padding: 5px 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+#score-board {
+  left: 10px;
+}
+
+#lives-board {
+  right: 10px;
+}
+
+#menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+#menu button {
+  font-family: "Press Start 2P", cursive, sans-serif;
+  font-size: 16px;
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #ffcc00;
+  color: #000;
+  box-shadow: 2px 2px 0 #000;
+  transition: all 0.2s;
+}
+
+#menu button:hover {
+  background-color: #ffd633;
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+#menu button:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0 #000;
+}
