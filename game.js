@@ -229,7 +229,7 @@ function init(isReset = false) {
 }
 
 function updateUI() {
-  score = Math.floor(scrollOffset / 10);
+  score = Math.floor(scrollOffset / 80);
   scoreBoard.innerText = `Score: ${score}`;
   livesBoard.innerText = `Lives: ${lives}`;
 }
@@ -337,6 +337,8 @@ function animate() {
       }
     }
 
+    updateUI();
+
     player.onGround = false;
 
     platforms.forEach((platform) => {
@@ -375,7 +377,7 @@ function animate() {
       } else {
         init();
       }
-      updateUI();
+      //updateUI();
     }
   }
 }
