@@ -15,6 +15,7 @@ const marioWalk2 = new Image();
 const marioWalk1Left = new Image();
 const marioWalk2Left = new Image();
 const blockImage = new Image();
+const cloudImage = new Image();
 
 const pipeImage = new Image();
 const pipeImageSmall = new Image();
@@ -27,6 +28,7 @@ marioWalk2.src = "assets/marioWalk2.png";
 marioWalk1Left.src = "assets/marioWalk1Left.png";
 marioWalk2Left.src = "assets/marioWalk2Left.png";
 blockImage.src = "assets/tile.png";
+cloudImage.src = "assets/clouds.png";
 const gravity = 0.5;
 
 class Player {
@@ -151,9 +153,32 @@ class Barrier {
   }
 }
 
+class Cloud {
+  constructor({ x, y, image, speed }) {
+    this.position = { x, y };
+    this.image = image;
+    this.speed = speed;
+    this.width = 150;
+    this.height = 80;
+  }
+  draw() {
+    ctx.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
+  }
+  update() {
+    this.draw();
+  }
+}
+
 let player = new Player();
 let platforms = [];
 let barriers = [];
+let clouds = [];
 let keys = {
   right: { pressed: false },
   left: { pressed: false },
@@ -186,6 +211,16 @@ function init(isReset = false) {
     new Barrier({ x: 1700, width: 60, height: 80, image: pipeImageSmall }),
     new Barrier({ x: 2100, width: 60, height: 120, image: pipeImage }),
     new Barrier({ x: 2600, width: 60, height: 80, image: pipeImageSmall }),
+  ];
+
+  clouds = [
+    new Cloud({ x: 200, y: 50, image: cloudImage, speed: -0.2 }),
+    new Cloud({ x: 500, y: 80, image: cloudImage, speed: -0.1 }),
+    new Cloud({ x: 850, y: 40, image: cloudImage, speed: -0.3 }),
+    new Cloud({ x: 1300, y: 70, image: cloudImage, speed: -0.2 }),
+    new Cloud({ x: 1700, y: 60, image: cloudImage, speed: -0.15 }),
+    new Cloud({ x: 2200, y: 90, image: cloudImage, speed: -0.25 }),
+    new Cloud({ x: 2800, y: 50, image: cloudImage, speed: -0.2 }),
   ];
   updateUI();
 
@@ -243,6 +278,9 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (gameState === "playing") {
+    clouds.forEach((cloud) => {
+      cloud.draw();
+    });
     platforms.forEach((platform) => {
       platform.draw();
     });
@@ -275,6 +313,10 @@ function animate() {
           platform.position.x -= 3;
         });
 
+        clouds.forEach((cloud) => {
+          cloud.position.x -= 1.5;
+        });
+
         //scroll barriers
         barriers.forEach((barrier) => {
           barrier.position.x -= 3;
@@ -287,6 +329,10 @@ function animate() {
 
         barriers.forEach((barrier) => {
           barrier.position.x += 3;
+        });
+
+        clouds.forEach((cloud) => {
+          cloud.position.x -= 1.5;
         });
       }
     }
