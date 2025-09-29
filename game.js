@@ -5,6 +5,8 @@ const livesBoard = document.getElementById('lives-board');
 const menu = document.getElementById('menu');
 const startBtn = document.getElementById('startBtn');
 const restartBtn = document.getElementById('restartBtn');
+const messageBoard = document.getElementById('message-board');
+let isRespawning = false; 
 
 let gameState = 'menu';
         let score = 0;
@@ -105,10 +107,7 @@ function animate() {
     if (gameState === 'playing') {
         player.update();
         
-        // if (keys.right.pressed) {
-        //     score += 1; 
-        //     updateUI();
-        // }
+        
 
         if (keys.right.pressed && player.position.x < 400) {
             player.velocity.x = 5;
@@ -136,27 +135,36 @@ function animate() {
         });
 
         if (scrollOffset > 3200) {
-            console.log('You win!');
             gameState = 'menu';
+            messageBoard.innerText = 'You Win!';
+            messageBoard.style.display = 'block'; 
             menu.style.display = 'flex';
             startBtn.style.display = 'none';
             restartBtn.style.display = 'block';
         }
+
         
-        if (player.position.y > canvas.height) {
-            console.log('You lose a life!');
+        if (player.position.y > canvas.height && !isRespawning) {
+            isRespawning = true; 
             lives--;
+            updateUI(); 
+
             if (lives <= 0) {
-                console.log('Game Over!');
+                
                 gameState = 'menu';
+                messageBoard.innerText = 'Game Over!';
+                messageBoard.style.display = 'block'; 
                 menu.style.display = 'flex';
                 startBtn.style.display = 'none';
                 restartBtn.style.display = 'block';
             } else {
-                init(); 
-            }
-            updateUI();
+               
+                setTimeout(() => {
+                    init(); 
+                    isRespawning = false; 
+                }, 1500); 
         }
+    }
     }
 }
 
@@ -177,6 +185,7 @@ window.addEventListener('keyup', (event) => {
 });
 
 function startGame() {
+    messageBoard.style.display = 'none';
     menu.style.display = 'none';
     init(true); 
     gameState = 'playing';
@@ -188,6 +197,4 @@ restartBtn.addEventListener('click', startGame);
 
 init();
 animate();
-
-
 

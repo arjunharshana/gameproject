@@ -81,3 +81,14 @@ body {
   transform: translateY(1px);
   box-shadow: 1px 1px 0 #000;
 }
+
+#message-board {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  color: #fff;
+  text-shadow: 3px 3px 0 #000;
+  text-align: center;
+}
