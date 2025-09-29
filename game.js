@@ -16,6 +16,12 @@ const marioWalk1Left = new Image();
 const marioWalk2Left = new Image();
 const blockImage = new Image();
 
+const pipeImage = new Image();
+const pipeImageSmall = new Image();
+
+pipeImage.src = "assets/pipe.png";
+pipeImageSmall.src = "assets/pipeSmall.png";
+
 marioWalk1.src = "assets/marioWalk1.png";
 marioWalk2.src = "assets/marioWalk2.png";
 marioWalk1Left.src = "assets/marioWalk1Left.png";
@@ -106,8 +112,48 @@ class Platform {
   }
 }
 
+class Barrier {
+  constructor({ x, y, width, height, image }) {
+    this.width = width;
+    this.height = height;
+    this.image = image;
+
+    this.position = { x, y: this.snapToSurface(x, this.width, this.height) };
+  }
+
+  snapToSurface(x, width, height) {
+    let bestY = null;
+
+    for (let platform of platforms) {
+      const withinX =
+        x + width > platform.position.x &&
+        x < platform.position.x + platform.width;
+
+      if (withinX) {
+        const candidateY = platform.position.y - height;
+        if (bestY === null || candidateY < bestY) {
+          bestY = candidateY;
+        }
+      }
+    }
+
+    return bestY !== null ? bestY : canvas.height - height - 80;
+  }
+
+  draw() {
+    ctx.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
+  }
+}
+
 let player = new Player();
 let platforms = [];
+let barriers = [];
 let keys = {
   right: { pressed: false },
   left: { pressed: false },
@@ -132,6 +178,15 @@ function init(isReset = false) {
     new Platform({ x: 2400, y: 240, width: 320, height: 40 }),
     new Platform({ x: 2880, y: 320, width: 800, height: 80 }),
   ];
+
+  barriers = [
+    new Barrier({ x: 700, width: 60, height: 120, image: pipeImage }),
+    new Barrier({ x: 950, width: 60, height: 80, image: pipeImageSmall }),
+    new Barrier({ x: 1340, width: 60, height: 120, image: pipeImage }),
+    new Barrier({ x: 1700, width: 60, height: 80, image: pipeImageSmall }),
+    new Barrier({ x: 2100, width: 60, height: 120, image: pipeImage }),
+    new Barrier({ x: 2600, width: 60, height: 80, image: pipeImageSmall }),
+  ];
   updateUI();
 
   keys.left.pressed = false;
@@ -144,6 +199,45 @@ function updateUI() {
   livesBoard.innerText = `Lives: ${lives}`;
 }
 
+//barrier collision
+function checkBarrierCollision(barrier) {
+  // From the left
+  if (
+    player.position.x + player.width > barrier.position.x &&
+    player.position.x < barrier.position.x &&
+    player.position.y + player.height > barrier.position.y &&
+    player.position.y < barrier.position.y + barrier.height
+  ) {
+    player.position.x = barrier.position.x - player.width;
+    player.velocity.x = 0;
+  }
+
+  // From the right
+  if (
+    player.position.x < barrier.position.x + barrier.width &&
+    player.position.x + player.width > barrier.position.x + barrier.width &&
+    player.position.y + player.height > barrier.position.y &&
+    player.position.y < barrier.position.y + barrier.height
+  ) {
+    player.position.x = barrier.position.x + barrier.width;
+    player.velocity.x = 0;
+  }
+
+  // Standing on top
+  if (
+    player.position.y + player.height <= barrier.position.y &&
+    player.position.y + player.height + player.velocity.y >=
+      barrier.position.y &&
+    player.position.x + player.width > barrier.position.x &&
+    player.position.x < barrier.position.x + barrier.width
+  ) {
+    player.position.y = barrier.position.y - player.height;
+    player.velocity.y = 0;
+    player.jumps = 0;
+    player.onGround = true;
+  }
+}
+
 function animate() {
   requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -151,6 +245,10 @@ function animate() {
   if (gameState === "playing") {
     platforms.forEach((platform) => {
       platform.draw();
+    });
+
+    barriers.forEach((barrier) => {
+      barrier.draw();
     });
   }
 
@@ -176,15 +274,25 @@ function animate() {
         platforms.forEach((platform) => {
           platform.position.x -= 3;
         });
+
+        //scroll barriers
+        barriers.forEach((barrier) => {
+          barrier.position.x -= 3;
+        });
       } else if (keys.left.pressed && scrollOffset > 0) {
         scrollOffset -= 3;
         platforms.forEach((platform) => {
           platform.position.x += 3;
         });
+
+        barriers.forEach((barrier) => {
+          barrier.position.x += 3;
+        });
       }
     }
 
     player.onGround = false;
+
     platforms.forEach((platform) => {
       if (
         player.position.y + player.height <= platform.position.y &&
@@ -199,6 +307,10 @@ function animate() {
       }
     });
 
+    barriers.forEach((barrier) => {
+      checkBarrierCollision(barrier);
+    });
+
     if (scrollOffset > 3200) {
       console.log("You win!");
       gameState = "menu";
@@ -208,10 +320,8 @@ function animate() {
     }
 
     if (player.position.y > canvas.height) {
-      console.log("You lose a life!");
       lives--;
       if (lives <= 0) {
-        console.log("Game Over!");
         gameState = "menu";
         menu.style.display = "flex";
         startBtn.style.display = "none";
