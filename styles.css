@@ -56,6 +56,9 @@ body {
   transform: translate(-50%, -50%);
   text-align: center;
 }
+#menu.with-message {
+  top: 65%; 
+}
 
 #menu button {
   font-family: "Press Start 2P", cursive, sans-serif;
@@ -84,11 +87,15 @@ body {
 
 #message-board {
   position: absolute;
-  top: 40%;
+  top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 48px;
   color: #fff;
   text-shadow: 3px 3px 0 #000;
   text-align: center;
+}
+
+#menu.with-message {
+  top: 70%; 
 }

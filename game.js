@@ -7,6 +7,7 @@ const startBtn = document.getElementById('startBtn');
 const restartBtn = document.getElementById('restartBtn');
 const messageBoard = document.getElementById('message-board');
 let isRespawning = false; 
+let cloudImage;
 
 let gameState = 'menu';
         let score = 0;
@@ -60,6 +61,43 @@ class Platform {
     }
 }
 
+
+class Cloud {
+    constructor({ x, y, image, speed }) {
+        this.position = { x, y };
+        this.image = image;
+        this.speed = speed;
+        this.width = 150;
+        this.height = 80;
+    }
+
+    draw() {
+        
+        ctx.drawImage(this.image, this.position.x, this.position.y, this.width, this.height);
+    
+    }
+
+    update() {
+        this.draw();
+        this.position.x += this.speed; 
+    }
+}
+
+let clouds = [];
+function loadAssets() {
+    return new Promise((resolve) => {
+        cloudImage = new Image();
+        cloudImage.src ='./images/clouds.png';
+        cloudImage.onload = () => {
+            resolve(); 
+        };
+    });
+}
+
+
+
+
+
 let player = new Player();
 let platforms =[];
 let keys={
@@ -75,6 +113,10 @@ lives = 3;
 score=0;
  }
 
+ keys.right.pressed = false;
+ keys.left.pressed = false;
+
+
 player = new Player();
 scrollOffset = 0 ;
 platforms =[
@@ -86,7 +128,13 @@ platforms =[
     new Platform({ x: 2500, y: 250, width: 300, height: 30 }),
     new Platform({ x: 3000, y: 320, width: 800, height: 80 }),
 ]
-updateUI();
+
+clouds = [
+    new Cloud({ x: 200, y: 50, image: cloudImage, speed: 0.2 }),
+    new Cloud({ x: 500, y: 80, image: cloudImage, speed: 0.1 }),
+    new Cloud({ x: 850, y: 40, image: cloudImage, speed: 0.3 })
+];
+
 
 }
 
@@ -100,13 +148,22 @@ function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    clouds.forEach(cloud => {
+        cloud.update();
+        
+        if (cloud.position.x > canvas.width) {
+            cloud.position.x = -cloud.width;
+        }
+    });
+
+
     platforms.forEach(platform => {
         platform.draw();
     });
 
     if (gameState === 'playing') {
         player.update();
-        
+        updateUI();
         
 
         if (keys.right.pressed && player.position.x < 400) {
@@ -137,6 +194,7 @@ function animate() {
         if (scrollOffset > 3200) {
             gameState = 'menu';
             messageBoard.innerText = 'You Win!';
+            menu.classList.add('with-message');
             messageBoard.style.display = 'block'; 
             menu.style.display = 'flex';
             startBtn.style.display = 'none';
@@ -153,6 +211,7 @@ function animate() {
                 
                 gameState = 'menu';
                 messageBoard.innerText = 'Game Over!';
+                menu.classList.add('with-message');
                 messageBoard.style.display = 'block'; 
                 menu.style.display = 'flex';
                 startBtn.style.display = 'none';
@@ -187,6 +246,7 @@ window.addEventListener('keyup', (event) => {
 function startGame() {
     messageBoard.style.display = 'none';
     menu.style.display = 'none';
+    menu.classList.remove('with-message');
     init(true); 
     gameState = 'playing';
 }
@@ -195,6 +255,9 @@ startBtn.addEventListener('click', startGame);
 restartBtn.addEventListener('click', startGame);
 
 
-init();
-animate();
+
+loadAssets().then(() => {
+    init();
+    animate();
+});
 
