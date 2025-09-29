@@ -10,32 +10,77 @@ let gameState = "menu";
 let score = 0;
 let lives = 3;
 
+const marioWalk1 = new Image();
+const marioWalk2 = new Image();
+const marioWalk1Left = new Image();
+const marioWalk2Left = new Image();
+
+marioWalk1.src = "assets/marioWalk1.png";
+marioWalk2.src = "assets/marioWalk2.png";
+marioWalk1Left.src = "assets/marioWalk1Left.png";
+marioWalk2Left.src = "assets/marioWalk2Left.png";
+
 const gravity = 0.5;
 
 class Player {
   constructor() {
     this.position = { x: 100, y: 100 };
-
     this.velocity = { x: 0, y: 0 };
-
     this.width = 40;
     this.height = 40;
-
     this.jumps = 0;
+
+    // Animation control
+    this.currentFrame = 0;
+    this.frameCounter = 0;
+    this.onGround = false;
+    this.facingRight = true;
   }
 
   draw() {
-    ctx.fillStyle = "#E53935";
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    let sprite;
+
+    if (!this.onGround) {
+      sprite = this.facingRight ? marioWalk2 : marioWalk2Left;
+    } else if (this.velocity.x !== 0) {
+      sprite =
+        this.currentFrame === 0
+          ? this.facingRight
+            ? marioWalk1
+            : marioWalk1Left
+          : this.facingRight
+          ? marioWalk2
+          : marioWalk2Left;
+    } else {
+      sprite = this.facingRight ? marioWalk1 : marioWalk1Left;
+    }
+
+    ctx.drawImage(
+      sprite,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
   }
 
   update() {
-    this.draw();
+    this.frameCounter++;
+
+    if ((keys.right.pressed || keys.left.pressed) && this.frameCounter > 5) {
+      this.currentFrame = (this.currentFrame + 1) % 2;
+      this.frameCounter = 0;
+    }
+
+    if (this.velocity.x > 0) this.facingRight = true;
+    else if (this.velocity.x < 0) this.facingRight = false;
 
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
 
     this.velocity.y += gravity;
+
+    this.draw();
   }
 }
 
@@ -127,6 +172,7 @@ function animate() {
       }
     }
 
+    player.onGround = false;
     platforms.forEach((platform) => {
       if (
         player.position.y + player.height <= platform.position.y &&
@@ -137,6 +183,7 @@ function animate() {
       ) {
         player.velocity.y = 0;
         player.jumps = 0;
+        player.onGround = true;
       }
     });
 
