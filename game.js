@@ -14,12 +14,13 @@ const marioWalk1 = new Image();
 const marioWalk2 = new Image();
 const marioWalk1Left = new Image();
 const marioWalk2Left = new Image();
+const blockImage = new Image();
 
 marioWalk1.src = "assets/marioWalk1.png";
 marioWalk2.src = "assets/marioWalk2.png";
 marioWalk1Left.src = "assets/marioWalk1Left.png";
 marioWalk2Left.src = "assets/marioWalk2Left.png";
-
+blockImage.src = "assets/tile.png";
 const gravity = 0.5;
 
 class Player {
@@ -90,8 +91,18 @@ class Platform {
   }
 
   draw() {
-    ctx.fillStyle = "#6D4C41";
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    const tileSize = 40;
+    for (let i = 0; i < this.width; i += tileSize) {
+      for (let j = 0; j < this.height; j += tileSize) {
+        ctx.drawImage(
+          blockImage,
+          this.position.x + i,
+          this.position.y + j,
+          Math.min(tileSize, this.width - i),
+          Math.min(tileSize, this.height - j)
+        );
+      }
+    }
   }
 }
 
@@ -113,13 +124,13 @@ function init(isReset = false) {
   player = new Player();
   scrollOffset = 0;
   platforms = [
-    new Platform({ x: 0, y: 320, width: 500, height: 80 }),
-    new Platform({ x: 580, y: 320, width: 500, height: 80 }),
-    new Platform({ x: 1200, y: 250, width: 200, height: 30 }),
-    new Platform({ x: 1600, y: 200, width: 200, height: 30 }),
-    new Platform({ x: 2000, y: 150, width: 150, height: 30 }),
-    new Platform({ x: 2500, y: 250, width: 300, height: 30 }),
-    new Platform({ x: 3000, y: 320, width: 800, height: 80 }),
+    new Platform({ x: 0, y: 320, width: 480, height: 80 }),
+    new Platform({ x: 560, y: 320, width: 480, height: 80 }),
+    new Platform({ x: 1200, y: 240, width: 200, height: 40 }),
+    new Platform({ x: 1600, y: 200, width: 200, height: 40 }),
+    new Platform({ x: 2000, y: 160, width: 160, height: 40 }),
+    new Platform({ x: 2400, y: 240, width: 320, height: 40 }),
+    new Platform({ x: 2880, y: 320, width: 800, height: 80 }),
   ];
   updateUI();
 
