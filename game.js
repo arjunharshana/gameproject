@@ -41,18 +41,13 @@ class Player {
     let sprite;
 
     if (!this.onGround) {
-      sprite = this.facingRight ? marioWalk2 : marioWalk2Left;
-    } else if (this.velocity.x !== 0) {
-      sprite =
-        this.currentFrame === 0
-          ? this.facingRight
-            ? marioWalk1
-            : marioWalk1Left
-          : this.facingRight
-          ? marioWalk2
-          : marioWalk2Left;
+      sprite = this.facing === "right" ? marioWalk2 : marioWalk2Left;
+    } else if (keys.right.pressed) {
+      sprite = this.currentFrame === 0 ? marioWalk1 : marioWalk2;
+    } else if (keys.left.pressed) {
+      sprite = this.currentFrame === 0 ? marioWalk1Left : marioWalk2Left;
     } else {
-      sprite = this.facingRight ? marioWalk1 : marioWalk1Left;
+      sprite = this.facing === "right" ? marioWalk1 : marioWalk1Left;
     }
 
     ctx.drawImage(
@@ -67,13 +62,16 @@ class Player {
   update() {
     this.frameCounter++;
 
-    if ((keys.right.pressed || keys.left.pressed) && this.frameCounter > 5) {
+    if ((keys.right.pressed || keys.left.pressed) && this.frameCounter > 10) {
       this.currentFrame = (this.currentFrame + 1) % 2;
       this.frameCounter = 0;
     }
 
-    if (this.velocity.x > 0) this.facingRight = true;
-    else if (this.velocity.x < 0) this.facingRight = false;
+    if (this.velocity.x > 0) {
+      this.facing = "right";
+    } else if (this.velocity.x < 0) {
+      this.facing = "left";
+    }
 
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
@@ -124,6 +122,9 @@ function init(isReset = false) {
     new Platform({ x: 3000, y: 320, width: 800, height: 80 }),
   ];
   updateUI();
+
+  keys.left.pressed = false;
+  keys.right.pressed = false;
 }
 
 function updateUI() {
@@ -151,23 +152,23 @@ function animate() {
     // }
 
     if (keys.right.pressed && player.position.x < 400) {
-      player.velocity.x = 5;
+      player.velocity.x = 3;
     } else if (
       (keys.left.pressed && player.position.x > 100) ||
       (keys.left.pressed && scrollOffset === 0 && player.position.x > 0)
     ) {
-      player.velocity.x = -5;
+      player.velocity.x = -3;
     } else {
       player.velocity.x = 0;
       if (keys.right.pressed) {
-        scrollOffset += 5;
+        scrollOffset += 3;
         platforms.forEach((platform) => {
-          platform.position.x -= 5;
+          platform.position.x -= 3;
         });
       } else if (keys.left.pressed && scrollOffset > 0) {
-        scrollOffset -= 5;
+        scrollOffset -= 3;
         platforms.forEach((platform) => {
-          platform.position.x += 5;
+          platform.position.x += 3;
         });
       }
     }
@@ -226,7 +227,7 @@ window.addEventListener("keydown", (event) => {
     case "w":
     case "ArrowUp":
     case " ":
-      if (player.jumps < 2) {
+      if (player.jumps < 1) {
         player.velocity.y = -15;
         player.jumps++;
       }
