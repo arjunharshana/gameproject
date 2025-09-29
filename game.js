@@ -1,5 +1,10 @@
 const canvas = document.getElementById('game-canvas');
 const ctx =canvas.getContext('2d');
+const scoreBoard = document.getElementById('score-board');
+const livesBoard = document.getElementById('lives-board');
+const menu = document.getElementById('menu');
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
 
 let gameState = 'menu';
         let score = 0;
@@ -34,9 +39,7 @@ class Player {
         this.position.y += this.velocity.y;
 
         
-        if (this.position.y + this.height + this.velocity.y < canvas.height) {
-            this.velocity.y += gravity;
-        }
+        this.velocity.y += gravity;
     }
 }
 
@@ -56,36 +59,37 @@ class Platform {
 }
 
 let player = new Player();
-let Platform =[];
-let key={
+let platforms =[];
+let keys={
     right:{pressed:false},
     left:{pressed:false}
 }
 
-let scrollOffet = 0;
+let scrollOffset = 0;
 
-function inti(isReset=false){
+function init(isReset=false){
     if(isReset){
 lives = 3;
 score=0;
  }
 
 player = new Player();
-scrollOffet = 0 ;
-Platform =[
-    new Platform({ x: 0, y: 500, width: 500, height: 80 }),
-    new Platform({ x: 580, y: 500, width: 500, height: 80 }),
-    new Platform({ x: 1200, y: 400, width: 200, height: 30 }),
-    new Platform({ x: 1600, y: 300, width: 200, height: 30 }),
-    new Platform({ x: 2000, y: 200, width: 150, height: 30 }),
-    new Platform({ x: 2500, y: 400, width: 300, height: 30 }),
-    new Platform({ x: 3000, y: 500, width: 800, height: 80 }),
+scrollOffset = 0 ;
+platforms =[
+    new Platform({ x: 0, y: 320, width: 500, height: 80 }),
+    new Platform({ x: 580, y: 320, width: 500, height: 80 }),
+    new Platform({ x: 1200, y: 250, width: 200, height: 30 }),
+    new Platform({ x: 1600, y: 200, width: 200, height: 30 }),
+    new Platform({ x: 2000, y: 150, width: 150, height: 30 }),
+    new Platform({ x: 2500, y: 250, width: 300, height: 30 }),
+    new Platform({ x: 3000, y: 320, width: 800, height: 80 }),
 ]
 updateUI();
 
 }
 
 function updateUI() {
+    score = Math.floor(scrollOffset / 10);
     scoreBoard.innerText = `Score: ${score}`;
     livesBoard.innerText = `Lives: ${lives}`;
 }
@@ -101,10 +105,10 @@ function animate() {
     if (gameState === 'playing') {
         player.update();
         
-        if (keys.right.pressed) {
-            score += 1; 
-            updateUI();
-        }
+        // if (keys.right.pressed) {
+        //     score += 1; 
+        //     updateUI();
+        // }
 
         if (keys.right.pressed && player.position.x < 400) {
             player.velocity.x = 5;
@@ -156,19 +160,19 @@ function animate() {
     }
 }
 
-window.addEventListener('keydown', ({ keyCode }) => {
+window.addEventListener('keydown', (event) => {
     if (gameState !== 'playing') return;
-    switch (keyCode) {
-        case 65: keys.left.pressed = true; break;
-        case 68: keys.right.pressed = true; break;
-        case 87: if(player.jumps < 2) { player.velocity.y = -12; player.jumps++; } break;
+    switch (event.key) {
+        case 'a': case 'ArrowLeft': keys.left.pressed = true; break;
+        case 'd': case 'ArrowRight': keys.right.pressed = true; break;
+        case 'w': case 'ArrowUp': case ' ': if (player.jumps < 2) { player.velocity.y = -15; player.jumps++; } break;
     }
 });
-window.addEventListener('keyup', ({ keyCode }) => {
+window.addEventListener('keyup', (event) => {
     if (gameState !== 'playing') return;
-    switch (keyCode) {
-        case 65: keys.left.pressed = false; break;
-        case 68: keys.right.pressed = false; break;
+    switch (event.key) {
+        case 'a': case 'ArrowLeft': keys.left.pressed = false; break;
+        case 'd': case 'ArrowRight': keys.right.pressed = false; break;
     }
 });
 
