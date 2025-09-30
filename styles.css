@@ -1,101 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Press Start 2P", cursive, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Press Start 2P', cursive;
 }
 
 body {
-  background-color: #5c94fc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+    background-color: #5c94fc; 
+    display: flex;
+    flex-direction: column; /* Stack heading and game-container */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
+/* --- HEADING STYLES --- */
+#heading h1 {
+    font-size: 3.5rem;
+    font-weight: normal;
+    color: #f7e018; /* Yellow */
+    margin-bottom: 20px; /* Space between title and game box */
+    text-shadow: 
+        -4px -4px 0 #fff, 4px -4px 0 #fff, -4px 4px 0 #fff, 4px 4px 0 #fff, /* White highlight */
+        -6px -6px 0 #e52521, 6px -6px 0 #e52521, -6px 6px 0 #e52521, 6px 6px 0 #e52521, /* Red outline */
+        -8px -8px 0 #000, 8px -8px 0 #000, -8px 8px 0 #000, 8px 8px 0 #000; /* Black shadow */
+}
+
+/* --- GAME CONTAINER & CANVAS --- */
 #game-container {
-  position: relative;
-  width: 800px;
-  height: 400px;
-  border: 4px solid #000;
-  background-color: #87ceeb;
-  overflow: hidden;
-  border-radius: 10px;
+    position: relative; 
+    width: 800px;
+    height: 400px;
+    border: 4px solid #000;
+    background-color: #87ceeb; 
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
 #game-canvas {
-  background-color: #87ceeb;
-  display: block;
+    background-color: transparent;
+    display: block;
 }
 
+/* --- SCORE AND LIVES BOARD --- */
 #score-board,
 #lives-board {
-  position: absolute;
-  top: 10px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 2px 2px 0 #000;
-  padding: 5px 10px;
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 5px;
+    position: absolute;
+    top: 15px;
+    font-size: 16px;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
 }
 
-#score-board {
-  left: 10px;
-}
+#score-board { left: 20px; }
+#lives-board { right: 20px; }
 
-#lives-board {
-  right: 10px;
-}
-
+/* --- MENU STYLES (NOW CONTAINS MESSAGE & BUTTONS) --- */
 #menu {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-#menu.with-message {
-  top: 65%; 
-}
-
-#menu button {
-  font-family: "Press Start 2P", cursive, sans-serif;
-  font-size: 16px;
-  padding: 10px 20px;
-  margin: 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background-color: #ffcc00;
-  color: #000;
-  box-shadow: 2px 2px 0 #000;
-  transition: all 0.2s;
-}
-
-#menu button:hover {
-  background-color: #ffd633;
-  transform: translateY(-2px);
-  box-shadow: 4px 4px 0 #000;
-}
-
-#menu button:active {
-  transform: translateY(1px);
-  box-shadow: 1px 1px 0 #000;
+    position: absolute; /* Position over the canvas */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    display: flex; /* Use Flexbox for internal layout */
+    flex-direction: column; /* Stack message and buttons vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center;     /* Center horizontally */
+    
+   
+    z-index: 10; /* Ensure it's on top */
 }
 
 #message-board {
-  position: absolute;
-  top: 35%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 48px;
-  color: #fff;
-  text-shadow: 3px 3px 0 #000;
-  text-align: center;
+    font-size: 48px;
+    color: #fff;
+    text-shadow: 4px 4px 0 #000;
+    margin-bottom: 40px; /* Space between message and buttons */
+    /* Remove absolute positioning and transform from here */
+    /* text-align: center; No longer needed as #menu handles centering */
 }
 
-#menu.with-message {
-  top: 70%; 
+#menu button {
+    font-size: 20px;
+    padding: 15px 30px;
+    border: 3px solid #000;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #ffcc00; 
+    color: #000;
+    box-shadow: 4px 4px 0 #000;
+    transition: all 0.1s ease-out;
+}
+
+#menu button:hover {
+    background-color: #ffd633;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #000;
+}
+
+#menu button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
 }
