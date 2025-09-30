@@ -8,6 +8,8 @@ const restartBtn = document.getElementById('restartBtn');
 const messageBoard = document.getElementById('message-board');
 let isRespawning = false; 
 let cloudImage;
+let enemyImage;
+
 
 let gameState = 'menu';
         let score = 0;
@@ -83,17 +85,60 @@ class Cloud {
     }
 }
 
+
+class Enemy {
+    constructor({ x, y, image }) {
+        this.position = { x, y };
+        this.velocity = { x: 1, y: 0 }; 
+        this.image = image;
+        this.width = 50;  
+        this.height = 50; 
+
+        this.patrolLimit = 100; 
+        this.walkDistance = 0;
+    }
+
+    draw() {
+        ctx.drawImage(this.image, this.position.x, this.position.y, this.width, this.height);
+    }
+
+    update() {
+        this.draw();
+        this.position.x += this.velocity.x;
+        this.walkDistance++;
+
+        
+        if (this.walkDistance > this.patrolLimit) {
+            this.velocity.x *= -1; 
+            this.walkDistance = 0;
+        }
+    }
+}
+
 let clouds = [];
+let enemies = []; 
+
+
 function loadAssets() {
     return new Promise((resolve) => {
+        let loadedCount = 0;
+        const totalAssets = 2; 
+
         cloudImage = new Image();
-        cloudImage.src ='./images/clouds.png';
+        cloudImage.src = './images/clouds.png';
         cloudImage.onload = () => {
-            resolve(); 
+            loadedCount++;
+            if (loadedCount === totalAssets) resolve();
+        };
+
+        enemyImage = new Image();
+        enemyImage.src = './images/enemy.png'; 
+        enemyImage.onload = () => {
+            loadedCount++;
+            if (loadedCount === totalAssets) resolve();
         };
     });
 }
-
 
 
 
@@ -130,11 +175,18 @@ platforms =[
 ]
 
 clouds = [
-    new Cloud({ x: 200, y: 50, image: cloudImage, speed: 0.2 }),
-    new Cloud({ x: 500, y: 80, image: cloudImage, speed: 0.1 }),
-    new Cloud({ x: 850, y: 40, image: cloudImage, speed: 0.3 })
+    new Cloud({ x: 200, y: 40, image: cloudImage, speed: 0.1 }),
+    new Cloud({ x: 500, y: 70, image: cloudImage, speed: 0.1 }),
+    new Cloud({ x: 800, y: 40, image: cloudImage, speed: 0.1 })
 ];
 
+function init(isReset = false) {
+    
+    enemies = [
+        new Enemy({ x: 600, y: 270, image: enemyImage }), 
+        new Enemy({ x: 1620, y: 150, image: enemyImage }), 
+        new Enemy({ x: 2550, y: 200, image: enemyImage })  ]
+}
 
 }
 
@@ -161,26 +213,39 @@ function animate() {
         platform.draw();
     });
 
+    platforms.forEach(platform => {
+        platform.draw();
+    });
+
+    
+    enemies.forEach(enemy => {
+        enemy.update();
+    });
+
     if (gameState === 'playing') {
         player.update();
         updateUI();
         
 
-        if (keys.right.pressed && player.position.x < 400) {
-            player.velocity.x = 5;
-        } else if ((keys.left.pressed && player.position.x > 100) || (keys.left.pressed && scrollOffset === 0 && player.position.x > 0)) {
-            player.velocity.x = -5;
-        } else {
-            player.velocity.x = 0;
-            if (keys.right.pressed) {
-                scrollOffset += 5;
-                platforms.forEach(platform => { platform.position.x -= 5; });
-            } else if (keys.left.pressed && scrollOffset > 0) {
-                scrollOffset -= 5;
-                platforms.forEach(platform => { platform.position.x += 5; });
-            }
-        }
-
+       
+if (keys.right.pressed && player.position.x < 400) {
+    player.velocity.x = 5;
+} else if ((keys.left.pressed && player.position.x > 100) || (keys.left.pressed && scrollOffset === 0 && player.position.x > 0)) {
+    player.velocity.x = -5;
+} else {
+    player.velocity.x = 0;
+    
+    
+    if (keys.right.pressed) {
+        scrollOffset += 5;
+        platforms.forEach(platform => { platform.position.x -= 5; });
+        enemies.forEach(enemy => { enemy.position.x -= 5; });
+    } else if (keys.left.pressed && scrollOffset > 0) {
+        scrollOffset -= 5;
+        platforms.forEach(platform => { platform.position.x += 5; });
+        enemies.forEach(enemy => { enemy.position.x += 5; }); 
+    }
+}
         platforms.forEach(platform => {
             if (player.position.y + player.height <= platform.position.y &&
                 player.position.y + player.height + player.velocity.y >= platform.position.y &&
@@ -190,6 +255,47 @@ function animate() {
                 player.jumps = 0;
             }
         });
+
+        enemies.forEach((enemy, index) => {
+            if (
+                player.position.x + player.width >= enemy.position.x &&
+                player.position.x <= enemy.position.x + enemy.width &&
+                player.position.y + player.height >= enemy.position.y &&
+                player.position.y <= enemy.position.y + enemy.height
+            ) {
+                
+
+                
+                if (player.velocity.y > 0 && player.position.y + player.height < enemy.position.y + 20) {
+                    player.velocity.y = -10; 
+                    enemies.splice(index, 1);
+                    score += 100; 
+                } else {
+                   
+                    if (!isRespawning) {
+                        lives--;
+                        isRespawning = true;
+                        if (lives <= 0) {
+                            
+                            gameState = 'menu';
+                            messageBoard.innerText = 'Game Over!';
+                            messageBoard.style.display = 'block';
+                            menu.style.display = 'flex';
+                            menu.classList.add('with-message');
+                            startBtn.style.display = 'none';
+                            restartBtn.style.display = 'block';
+                        } else {
+                         
+                            setTimeout(() => {
+                                init();
+                                isRespawning = false;
+                            }, 1500);
+                        }
+                    }
+                }
+            }
+        });
+
 
         if (scrollOffset > 3200) {
             gameState = 'menu';
