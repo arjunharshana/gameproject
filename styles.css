@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
 * {
   margin: 0;
   padding: 0;
@@ -8,9 +10,21 @@
 body {
   background-color: #5c94fc;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
+}
+
+#heading h1 {
+  font-size: 3.5rem;
+  font-weight: normal;
+  color: #f7e018;
+  margin-bottom: 20px;
+  text-shadow: -4px -4px 0 #fff, 4px -4px 0 #fff, -4px 4px 0 #fff,
+    4px 4px 0 #fff, -6px -6px 0 #e52521, 6px -6px 0 #e52521, -6px 6px 0 #e52521,
+    6px 6px 0 #e52521, -8px -8px 0 #000, 8px -8px 0 #000, -8px 8px 0 #000,
+    8px 8px 0 #000;
 }
 
 #game-container {
@@ -21,6 +35,7 @@ body {
   background-color: #87ceeb;
   overflow: hidden;
   border-radius: 10px;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
 #game-canvas {
@@ -31,8 +46,8 @@ body {
 #score-board,
 #lives-board {
   position: absolute;
-  top: 10px;
-  font-size: 18px;
+  top: 15px;
+  font-size: 16px;
   font-weight: bold;
   color: #fff;
   text-shadow: 2px 2px 0 #000;
@@ -55,6 +70,13 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+}
+
+#message-board {
+  font-size: 48px;
+  color: #fff;
+  text-shadow: 4px 4px 0 #000;
+  margin-bottom: 40px;
 }
 
 #menu button {
