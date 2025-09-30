@@ -34,12 +34,12 @@
 ## Deployed link
 - https://gameproject-liart.vercel.app/
 
-### Prerequisites
+## Prerequisites
 
 -   A modern web browser (e.g., Chrome, Firefox, Safari).
 -   Git installed on your machine (optional, for cloning).
 
-### Installation
+## Installation
 
 1.  **Clone the repository:**
     ```bash
