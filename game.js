@@ -5,6 +5,7 @@ const livesBoard = document.getElementById("lives-board");
 const menu = document.getElementById("menu");
 const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
+const messageBoard = document.getElementById("message-board");
 
 let gameState = "menu";
 let score = 0;
@@ -16,6 +17,7 @@ const marioWalk1Left = new Image();
 const marioWalk2Left = new Image();
 const blockImage = new Image();
 const cloudImage = new Image();
+const enemyImage = new Image();
 
 const pipeImage = new Image();
 const pipeImageSmall = new Image();
@@ -29,6 +31,7 @@ marioWalk1Left.src = "assets/marioWalk1Left.png";
 marioWalk2Left.src = "assets/marioWalk2Left.png";
 blockImage.src = "assets/tile.png";
 cloudImage.src = "assets/clouds.png";
+enemyImage.src = "assets/enemy.png";
 const gravity = 0.5;
 
 class Player {
@@ -153,6 +156,36 @@ class Barrier {
   }
 }
 
+class Enemy {
+  constructor({ x, y, image }) {
+    this.position = { x, y };
+    this.velocity = { x: 1, y: 0 };
+    this.image = image;
+    this.width = 40;
+    this.height = 40;
+    this.patrolLimit = 100;
+    this.walkDistance = 0;
+  }
+  draw() {
+    ctx.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
+  }
+  update() {
+    this.position.x += this.velocity.x;
+    this.walkDistance++;
+    if (this.walkDistance > this.patrolLimit) {
+      this.velocity.x *= -1;
+      this.walkDistance = 0;
+    }
+    this.draw();
+  }
+}
+
 class Cloud {
   constructor({ x, y, image, speed }) {
     this.position = { x, y };
@@ -179,6 +212,8 @@ let player = new Player();
 let platforms = [];
 let barriers = [];
 let clouds = [];
+let enemies = [];
+let isRespawning = false;
 let keys = {
   right: { pressed: false },
   left: { pressed: false },
@@ -222,6 +257,12 @@ function init(isReset = false) {
     new Cloud({ x: 2200, y: 90, image: cloudImage, speed: -0.25 }),
     new Cloud({ x: 2800, y: 50, image: cloudImage, speed: -0.2 }),
   ];
+
+  enemies = [
+    new Enemy({ x: 600, y: 280, image: enemyImage }),
+    new Enemy({ x: 1620, y: 160, image: enemyImage }),
+    new Enemy({ x: 2550, y: 210, image: enemyImage }),
+  ];
   updateUI();
 
   keys.left.pressed = false;
@@ -232,6 +273,30 @@ function updateUI() {
   score = Math.floor(scrollOffset / 80);
   scoreBoard.innerText = `Score: ${score}`;
   livesBoard.innerText = `Lives: ${lives}`;
+}
+
+function handleLoseLife() {
+  if (isRespawning) return;
+  isRespawning = true;
+  lives--;
+  updateUI();
+  if (lives <= 0) {
+    handleGameOver("Game Over!");
+  } else {
+    setTimeout(() => {
+      init();
+      isRespawning = false;
+    }, 1500);
+  }
+}
+
+function handleGameOver(message) {
+  gameState = "menu";
+  messageBoard.innerText = message;
+  messageBoard.style.display = "block";
+  menu.style.display = "flex";
+  startBtn.style.display = "none";
+  restartBtn.style.display = "block";
 }
 
 //barrier collision
@@ -288,6 +353,10 @@ function animate() {
     barriers.forEach((barrier) => {
       barrier.draw();
     });
+
+    enemies.forEach((enemy) => {
+      enemy.update();
+    });
   }
 
   if (gameState === "playing") {
@@ -321,6 +390,9 @@ function animate() {
         barriers.forEach((barrier) => {
           barrier.position.x -= 3;
         });
+        enemies.forEach((e) => {
+          e.position.x -= 3;
+        });
       } else if (keys.left.pressed && scrollOffset > 0) {
         scrollOffset -= 3;
         platforms.forEach((platform) => {
@@ -333,6 +405,10 @@ function animate() {
 
         clouds.forEach((cloud) => {
           cloud.position.x -= 1.5;
+        });
+
+        enemies.forEach((e) => {
+          e.position.x += 3;
         });
       }
     }
@@ -359,25 +435,31 @@ function animate() {
       checkBarrierCollision(barrier);
     });
 
+    enemies.forEach((enemy, index) => {
+      if (
+        player.position.x + player.width >= enemy.position.x &&
+        player.position.x <= enemy.position.x + enemy.width &&
+        player.position.y + player.height >= enemy.position.y &&
+        player.position.y <= enemy.position.y + enemy.height
+      ) {
+        if (
+          player.velocity.y > 0 &&
+          player.position.y + player.height < enemy.position.y + 20
+        ) {
+          player.velocity.y = -10;
+          enemies.splice(index, 1);
+        } else {
+          handleLoseLife();
+        }
+      }
+    });
+
     if (scrollOffset > 3200) {
-      console.log("You win!");
-      gameState = "menu";
-      menu.style.display = "flex";
-      startBtn.style.display = "none";
-      restartBtn.style.display = "block";
+      handleGameOver("You Win!");
     }
 
     if (player.position.y > canvas.height) {
-      lives--;
-      if (lives <= 0) {
-        gameState = "menu";
-        menu.style.display = "flex";
-        startBtn.style.display = "none";
-        restartBtn.style.display = "block";
-      } else {
-        init();
-      }
-      //updateUI();
+      handleLoseLife();
     }
   }
 }
@@ -418,6 +500,7 @@ window.addEventListener("keyup", (event) => {
 });
 
 function startGame() {
+  messageBoard.style.display = "none";
   menu.style.display = "none";
   init(true);
   gameState = "playing";
