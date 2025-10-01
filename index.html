@@ -8,16 +8,42 @@
     <script defer src="game.js"></script>
   </head>
   <body>
-    <div><h1>Mini Mario</h1></div>
-    <div id="game-container">
-      <canvas id="game-canvas" width="800" height="400"></canvas>
-      <div id="score-board">Score: 0</div>
-      <div id="lives-board">Lives: 3</div>
-      <div id="menu">
-        <button id="startBtn">Start Game</button>
-        <button id="restartBtn" style="display: none">Restart</button>
+    <main class="game-wrapper">
+      <div><h1>Mini Mario</h1></div>
+      <div id="game-container">
+        <canvas id="game-canvas" width="800" height="400"></canvas>
+        <div id="score-board">Score: 0</div>
+        <div id="lives-board">Lives: 3</div>
+        <div id="menu">
+          <button id="startBtn">Start Game</button>
+          <button id="restartBtn" style="display: none">Restart</button>
+        </div>
+        <div id="message-board" style="display: none"></div>
       </div>
-      <div id="message-board" style="display: none"></div>
+    </main>
+
+    <div id="mobile-controls">
+      <div id="left-right">
+        <div class="control-btn" id="leftBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="black" d="M15 18l-6-6 6-6v12z" />
+          </svg>
+        </div>
+
+        <div class="control-btn" id="rightBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="black" d="M9 6l6 6-6 6V6z" />
+          </svg>
+        </div>
+      </div>
+
+      <div id="jump">
+        <div class="control-btn" id="jumpBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="black" d="M12 2l4 8H8l4-8zm0 20v-8h-2v8h2z" />
+          </svg>
+        </div>
+      </div>
     </div>
   </body>
 </html>
