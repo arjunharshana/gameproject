@@ -178,30 +178,36 @@ body {
 
 @media (max-height: 500px) and (orientation: landscape) {
   body {
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 0 10px;
+    font-size: 8px;
+    padding: 0 20px;
     height: 100vh;
+    overflow: hidden;
   }
 
   #game-container {
-    width: 100vh;
+    flex: 0 0 auto;
+    width: 75vw;
     max-height: none;
+    aspect-ratio: 2/1;
   }
   #heading {
     display: none;
   }
   #mobile-controls {
     display: flex;
-    position: absolute;
+    position: relative;
+    flex-direction: row;
+    margin-top: 25px;
     width: 100%;
+
     padding: 0 20px;
     justify-content: space-between;
   }
   .control-btn {
     width: 45px;
     height: 45px;
-    font-size: 20px;
   }
 }
