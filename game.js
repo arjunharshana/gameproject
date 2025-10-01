@@ -1,3 +1,7 @@
+const bgm = new Audio("assets/bgm.mp3");
+const jumpSound = new Audio("assets/jump.mp3");
+const deathSound = new Audio("assets/death.mp3");
+
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 const scoreBoard = document.getElementById("score-board");
@@ -37,6 +41,9 @@ blockImage.src = "assets/tile.png";
 cloudImage.src = "assets/clouds.png";
 enemyImage.src = "assets/enemy.png";
 const gravity = 0.5;
+
+bgm.loop = true;
+bgm.volume = 0.2;
 
 class Player {
   constructor() {
@@ -285,8 +292,13 @@ function handleLoseLife() {
   if (isRespawning) return;
   isRespawning = true;
   lives--;
+
   updateUI();
   if (lives <= 0) {
+    deathSound.currentTime = 0;
+    deathSound.play();
+    bgm.pause();
+    bgm.currentTime = 0;
     handleGameOver("Game Over!");
   } else {
     setTimeout(() => {
@@ -474,10 +486,6 @@ function animate() {
       }
     });
 
-    if (scrollOffset > 3200) {
-      handleGameOver("You Win!");
-    }
-
     if (player.position.y > canvas.height) {
       handleLoseLife();
     }
@@ -499,6 +507,8 @@ window.addEventListener("keydown", (event) => {
     case "ArrowUp":
     case " ":
       if (player.jumps < 1) {
+        jumpSound.currentTime = 0;
+        jumpSound.play();
         player.velocity.y = -15;
         player.jumps++;
       }
@@ -568,6 +578,8 @@ if (jumpBtn) {
   jumpBtn.addEventListener("touchstart", (e) => {
     e.preventDefault();
     if (player.jumps < 1) {
+      jumpSound.currentTime = 0;
+      jumpSound.play();
       player.velocity.y = -15;
       player.jumps++;
     }
@@ -576,6 +588,8 @@ if (jumpBtn) {
   jumpBtn.addEventListener("mousedown", (e) => {
     e.preventDefault();
     if (gameState === "playing" && player.jumps < 1) {
+      jumpSound.currentTime = 0;
+      jumpSound.play();
       player.velocity.y = -15;
       player.jumps++;
     }
@@ -600,8 +614,16 @@ function startGame() {
   gameState = "playing";
 }
 
-startBtn.addEventListener("click", startGame);
-restartBtn.addEventListener("click", startGame);
+startBtn.addEventListener("click", () => {
+  startGame();
+  bgm.currentTime = 0;
+  bgm.play();
+});
+restartBtn.addEventListener("click", () => {
+  startGame();
+  bgm.currentTime = 0;
+  bgm.play();
+});
 
 init();
 animate();
