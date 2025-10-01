@@ -7,6 +7,10 @@ const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
 const messageBoard = document.getElementById("message-board");
 
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
+const jumpBtn = document.getElementById("jumpBtn");
+
 let gameState = "menu";
 let score = 0;
 let lives = 3;
@@ -46,7 +50,7 @@ class Player {
     this.currentFrame = 0;
     this.frameCounter = 0;
     this.onGround = false;
-    this.facingRight = true;
+    this.facing = "right";
   }
 
   draw() {
@@ -88,7 +92,9 @@ class Player {
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
 
-    this.velocity.y += gravity;
+    if (this.position.y + this.height + this.velocity.y < canvas.height) {
+      this.velocity.y += gravity;
+    }
 
     this.draw();
   }
@@ -366,51 +372,54 @@ function animate() {
     //     score += 1;
     //     updateUI();
     // }
+    if (!isRespawning) {
+      if (keys.right.pressed && player.position.x < 400) {
+        player.velocity.x = 3;
+      } else if (
+        (keys.left.pressed && player.position.x > 100) ||
+        (keys.left.pressed && scrollOffset === 0 && player.position.x > 0)
+      ) {
+        player.velocity.x = -3;
+      } else {
+        player.velocity.x = 0;
+        if (keys.right.pressed) {
+          scrollOffset += 3;
+          platforms.forEach((platform) => {
+            platform.position.x -= 3;
+          });
 
-    if (keys.right.pressed && player.position.x < 400) {
-      player.velocity.x = 3;
-    } else if (
-      (keys.left.pressed && player.position.x > 100) ||
-      (keys.left.pressed && scrollOffset === 0 && player.position.x > 0)
-    ) {
-      player.velocity.x = -3;
+          clouds.forEach((cloud) => {
+            cloud.position.x -= 1.5;
+          });
+
+          //scroll barriers
+          barriers.forEach((barrier) => {
+            barrier.position.x -= 3;
+          });
+          enemies.forEach((e) => {
+            e.position.x -= 3;
+          });
+        } else if (keys.left.pressed && scrollOffset > 0) {
+          scrollOffset -= 3;
+          platforms.forEach((platform) => {
+            platform.position.x += 3;
+          });
+
+          barriers.forEach((barrier) => {
+            barrier.position.x += 3;
+          });
+
+          clouds.forEach((cloud) => {
+            cloud.position.x -= 1.5;
+          });
+
+          enemies.forEach((e) => {
+            e.position.x += 3;
+          });
+        }
+      }
     } else {
       player.velocity.x = 0;
-      if (keys.right.pressed) {
-        scrollOffset += 3;
-        platforms.forEach((platform) => {
-          platform.position.x -= 3;
-        });
-
-        clouds.forEach((cloud) => {
-          cloud.position.x -= 1.5;
-        });
-
-        //scroll barriers
-        barriers.forEach((barrier) => {
-          barrier.position.x -= 3;
-        });
-        enemies.forEach((e) => {
-          e.position.x -= 3;
-        });
-      } else if (keys.left.pressed && scrollOffset > 0) {
-        scrollOffset -= 3;
-        platforms.forEach((platform) => {
-          platform.position.x += 3;
-        });
-
-        barriers.forEach((barrier) => {
-          barrier.position.x += 3;
-        });
-
-        clouds.forEach((cloud) => {
-          cloud.position.x -= 1.5;
-        });
-
-        enemies.forEach((e) => {
-          e.position.x += 3;
-        });
-      }
     }
 
     updateUI();
@@ -499,6 +508,72 @@ window.addEventListener("keyup", (event) => {
   }
 });
 
+if (leftBtn) {
+  leftBtn.addEventListener("mousedown", (e) => {
+    if (gameState === "playing") keys.left.pressed = true;
+  });
+
+  leftBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    if (gameState === "playing") keys.left.pressed = true;
+  });
+
+  leftBtn.addEventListener("mouseup", (e) => {
+    if (gameState === "playing") keys.left.pressed = false;
+  });
+  leftBtn.addEventListener("mouseleave", (e) => {
+    if (gameState === "playing") keys.left.pressed = false;
+  });
+
+  leftBtn.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    if (gameState === "playing") keys.left.pressed = false;
+  });
+}
+
+if (rightBtn) {
+  rightBtn.addEventListener("mousedown", (e) => {
+    if (gameState === "playing") keys.right.pressed = true;
+  });
+
+  rightBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    if (gameState === "playing") keys.right.pressed = true;
+  });
+  rightBtn.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    if (gameState === "playing") keys.right.pressed = false;
+  });
+
+  rightBtn.addEventListener("mouseup", (e) => {
+    if (gameState === "playing") keys.right.pressed = false;
+  });
+  rightBtn.addEventListener("mouseleave", (e) => {
+    if (gameState === "playing") keys.right.pressed = false;
+  });
+}
+
+if (jumpBtn) {
+  jumpBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    if (player.jumps < 1) {
+      player.velocity.y = -15;
+      player.jumps++;
+    }
+  });
+
+  jumpBtn.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    if (gameState === "playing" && player.jumps < 1) {
+      player.velocity.y = -15;
+      player.jumps++;
+    }
+  });
+  jumpBtn.addEventListener("mouseup", (e) => {
+    e.preventDefault();
+  });
+  jumpBtn.addEventListener("mouseleave", (e) => {});
+}
 function startGame() {
   messageBoard.style.display = "none";
   menu.style.display = "none";
