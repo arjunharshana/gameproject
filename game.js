@@ -445,16 +445,27 @@ function animate() {
     });
 
     enemies.forEach((enemy, index) => {
-      if (
-        player.position.x + player.width >= enemy.position.x &&
-        player.position.x <= enemy.position.x + enemy.width &&
-        player.position.y + player.height >= enemy.position.y &&
-        player.position.y <= enemy.position.y + enemy.height
-      ) {
-        if (
+      const marioBottom = player.position.y + player.height;
+      const marioTop = player.position.y;
+      const marioLeft = player.position.x;
+      const marioRight = player.position.x + player.width;
+
+      const enemyBottom = enemy.position.y + enemy.height;
+      const enemyTop = enemy.position.y;
+      const enemyLeft = enemy.position.x;
+      const enemyRight = enemy.position.x + enemy.width;
+
+      const isTouchingHorizontally =
+        marioRight > enemyLeft && marioLeft < enemyRight;
+      const isTouchingVertically =
+        marioBottom > enemyTop && marioTop < enemyBottom;
+
+      if (isTouchingHorizontally && isTouchingVertically) {
+        const isStomp =
           player.velocity.y > 0 &&
-          player.position.y + player.height < enemy.position.y + 20
-        ) {
+          marioBottom - player.velocity.y <= enemyTop + 5;
+
+        if (isStomp) {
           player.velocity.y = -10;
           enemies.splice(index, 1);
         } else {
@@ -576,7 +587,15 @@ if (jumpBtn) {
 }
 function startGame() {
   messageBoard.style.display = "none";
+  isRespawning = false;
+  keys.left.pressed = false;
+  keys.right.pressed = false;
+
+  messageBoard.style.display = "none";
   menu.style.display = "none";
+  startBtn.style.display = "none";
+  restartBtn.style.display = "none";
+
   init(true);
   gameState = "playing";
 }
