@@ -189,7 +189,7 @@ body {
 
   #game-container {
     flex: 0 0 auto;
-    width: 75vw;
+    width: 50vw;
     max-height: none;
     aspect-ratio: 2/1;
   }
@@ -206,8 +206,17 @@ body {
     padding: 0 20px;
     justify-content: space-between;
   }
+
+  #menu {
+    font-size: 2vw;
+  }
+
+  #menu button {
+    font-size: 1em;
+    padding: 0,5em 10px;
+  }}
   .control-btn {
-    width: 45px;
-    height: 45px;
+    width: 30px;
+    height: 30px;
   }
 }
