@@ -213,10 +213,10 @@ body {
 
   #menu button {
     font-size: 1em;
-    padding: 0,5em 10px;
-  }}
-  .control-btn {
-    width: 30px;
-    height: 30px;
+    padding: 0 5em 10px;
   }
+}
+.control-btn {
+  width: 30px;
+  height: 30px;
 }
