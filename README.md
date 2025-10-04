@@ -79,6 +79,5 @@
 
 Here are some features planned for future updates:
 
--   🔔 Add sound effects for jumping, stomping, and background music.
 -   🍄 Implement power-ups like mushrooms and fire flowers.
 -   💰 Introduce coins and other collectibles to enhance scoring.
